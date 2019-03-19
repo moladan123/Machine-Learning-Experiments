@@ -31,7 +31,7 @@ class NeuralNetwork:
 
         self.biases = [np.zeros(size) for size in self.sizes[1:]]
 
-        l = Functions.linear # last layer does not need an activation
+        l = Functions.linear   # last layer does not need an activation
         f = Functions.sigmoid
         self.activations= [f, f, f, l]
 
@@ -60,7 +60,14 @@ class NeuralNetwork:
             self.nodes[edge] = x
         return x
 
-    def backward(self):
+    def backward(self, yhat):
+
+        # propogate layer by layer
+        for layer in reversed(range(len(self.activations))):
+
+
+            self.weights[layer] -= gradient * LEARNING_RATE * error
+
         pass
 
 
