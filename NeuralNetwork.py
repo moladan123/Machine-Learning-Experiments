@@ -33,6 +33,16 @@ class NeuralNetwork:
         f = Functions.sigmoid
         self.activations= [f, f, f, l]
 
+    def __str__(self):
+        ret = "Network with sizes " + str(self.sizes) + "\n"
+        ret += "learning rate " + str(self.learning_rate) + "\n"
+        ret += "nodes " + str(self.nodes) + "\n"
+        ret += "weights " + str(self.weights) + "\n"
+        ret += "biases " + str(self.biases) + "\n"
+        ret += "activations " + str([f.__name__ for f in self.activations]) + "\n"
+        return ret
+
+
     def forward(self, x: np.array):
         """
         Passes in a training example for the given network
@@ -80,7 +90,6 @@ if __name__ == "__main__":
     nn = NeuralNetwork([5, 10, 10, 10, 1])
     x = np.array([1, 2, 3, 4, 5])
     y = nn.forward(x)
-    nn.backward(y)
+    # nn.backward(y)
     print(y)
-    print(nn.activations)
-    print(nn.nodes)
+    print(nn)
