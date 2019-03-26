@@ -42,8 +42,7 @@ class NeuralNetwork:
         ret += "activations " + str([f.__name__ for f in self.activations]) + "\n"
         return ret
 
-
-    def forward(self, x: np.array):
+    def forward(self, x: np.array, verbose=False):
         """
         Passes in a training example for the given network
         Updates the network nodes with the new values from the training example
@@ -59,37 +58,47 @@ class NeuralNetwork:
             b = self.biases[edge]
 
             # calculate the value of the next layer
-            print(w.shape, x.shape, b.shape)
+            if verbose:
+                print(w.shape, x.shape, b.shape)
             x = f(x.dot(w) + b)
 
             # remember the value of the edge for gradient descent
             self.nodes[edge] = x
         return x
 
+    def backward(self, yhat, verbose=False):
+        """ Doesn't yet work don't use
+        """
 
-    def backward(self, yhat):
-
-        gradients = dict()
+        layer_to_gradient = dict()
         prev_error = 2 * (yhat - self.nodes[-1])
 
         # calculate derivative at each layer
         for layer in reversed(range(len(self.activations))):
             f = self.activations[layer]
-            print(prev_error, self.weights[layer], self.nodes[layer], f.__name__)
-            prev_error = np.dot(prev_error, self.weights[layer]) * f(self.nodes[layer], derivative=True)
-            gradients[layer] = np.dot(self.nodes[layer].T, prev_error)
+
+            if verbose:
+                print(prev_error, self.weights[layer], self.nodes[layer], f.__name__)
+
+            temp = np.dot(self.weights[layer], prev_error)
+            prev_error = temp * f(self.nodes[layer - 1], derivative=True)
+
+            layer_to_gradient[layer] = np.dot(self.nodes[layer].T, prev_error)
 
         # actually update all of the weights
-        print(gradients)
+        print(layer_to_gradient)
+        time.sleep(5)
         for layer in range(len(self.activations)):
-            self.weights[layer] -= self.learning_rate * gradients[layer]
+            self.weights[layer] -= self.learning_rate * layer_to_gradient[layer]
 
 
 if __name__ == "__main__":
     # creates a neural network with 5 inputs, 3 hidden layers, and 1 output node
     nn = NeuralNetwork([5, 10, 10, 10, 1])
-    x = np.array([1, 2, 3, 4, 5])
+    x = np.array([0, 1, 0, 1, 0])
     y = nn.forward(x)
-    # nn.backward(y)
-    print(y)
     print(nn)
+    print(y)
+
+    time.sleep(1)
+    nn.backward(np.array([0]), verbose=True)
